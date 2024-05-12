@@ -6,9 +6,9 @@ import 'package:mine/widgets/current_weather_widget.dart';
 import 'package:mine/widgets/daily_forecast_widget.dart';
 import 'package:mine/widgets/hourly_forecast_widget.dart';
 import 'package:mine/widgets/crop_suggestions_widget.dart';
-import 'package:mine/widgets/recommendation_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'home_screen_utils.dart'; // Import the new file
+
+import 'home_screen_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   final String apiKey;
@@ -66,9 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nimbus', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+        title: Text('Nimbus', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
+        backgroundColor: Colors.blue,
         actions: [
-          IconButton(icon: Icon(Icons.search), onPressed: () => showSearchScreen(context, widget.apiKey, (Weather weather, List<Weather> dailyForecast, List<Weather> hourlyForecast, String locationName) {
+          IconButton(icon: Icon(Icons.search, color: Colors.white), onPressed: () => showSearchScreen(context, widget.apiKey, (Weather weather, List<Weather> dailyForecast, List<Weather> hourlyForecast, String locationName) {
             setState(() {
               currentWeather = weather;
               this.dailyForecast = dailyForecast;
@@ -76,49 +77,56 @@ class _HomeScreenState extends State<HomeScreen> {
               this.locationName = locationName;
             });
           })),
-          IconButton(icon: Icon(Icons.info), onPressed: () => showRecommendation(context, currentWeather)),
+          IconButton(icon: Icon(Icons.info, color: Colors.white), onPressed: () => showRecommendation(context, currentWeather)),
         ],
-        backgroundColor: Colors.transparent,
         elevation: 0,
       ),
       drawer: buildDrawer(context, () {}), // Adjust the onFeedbackTap callback as needed
-      body: SingleChildScrollView(
+      body: ListView(
         padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (isLoading)
-              Center(child: CircularProgressIndicator())
-            else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Card(
-                    child: CurrentWeatherWidget(currentWeather: currentWeather, locationName: locationName, timezoneIdentifier: currentWeather.zone ?? 'UTC'),
-                  ),
-                  SizedBox(height: 20),
-                  buildButton(context, 'Crop Suggestions', showCropSuggestions, () => setState(() => showCropSuggestions = !showCropSuggestions)),
-                  SizedBox(height: 10),
-                  buildButton(context, 'Hourly Forecast', showHourlyForecast, () => setState(() => showHourlyForecast = !showHourlyForecast)),
-                  SizedBox(height: 10),
-                  buildButton(context, 'Daily Forecast', showDailyForecast, () => setState(() => showDailyForecast = !showDailyForecast)),
-                  SizedBox(height: 20),
-                  if (showCropSuggestions) Card(
-                    child: CropSuggestionWidget(temperature: currentWeather.temperature),
-                  ),
-                  SizedBox(height: 20),
-                  if (showHourlyForecast) Card(
-                    child: HourlyForecastWidget(hourlyForecast: hourlyForecast),
-                  ),
-                  SizedBox(height: 20),
-                  if (showDailyForecast) Card(
-                    child: DailyForecastWidget(dailyForecast: dailyForecast),
-                  ),
-                  SizedBox(height: 20),
-                ],
-              ),
-          ],
-        ),
+        children: [
+          if (isLoading)
+            Center(child: CircularProgressIndicator())
+          else
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Card(
+                  child: CurrentWeatherWidget(currentWeather: currentWeather, locationName: locationName, timezoneIdentifier: currentWeather.zone ?? 'UTC'),
+                ),
+                SizedBox(height: 20),
+                buildToggleButton(context, 'Crop Suggestions', showCropSuggestions, () => setState(() => showCropSuggestions = !showCropSuggestions)),
+                SizedBox(height: 10),
+                buildToggleButton(context, 'Hourly Forecast', showHourlyForecast, () => setState(() => showHourlyForecast = !showHourlyForecast)),
+                SizedBox(height: 10),
+                buildToggleButton(context, 'Daily Forecast', showDailyForecast, () => setState(() => showDailyForecast = !showDailyForecast)),
+                SizedBox(height: 20),
+                if (showCropSuggestions) Card(
+                  child: CropSuggestionWidget(temperature: currentWeather.temperature),
+                ),
+                SizedBox(height: 20),
+                if (showHourlyForecast) Card(
+                  child: HourlyForecastWidget(hourlyForecast: hourlyForecast),
+                ),
+                SizedBox(height: 20),
+                if (showDailyForecast) Card(
+                  child: DailyForecastWidget(dailyForecast: dailyForecast),
+                ),
+                SizedBox(height: 20),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildToggleButton(BuildContext context, String label, bool isToggled, VoidCallback onPressed) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(isToggled ? Icons.check_box : Icons.check_box_outline_blank, color: Colors.white),
+      label: Text(label, style: TextStyle(color: Colors.white)),
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white, backgroundColor: isToggled ? Colors.blue : Colors.grey,
       ),
     );
   }

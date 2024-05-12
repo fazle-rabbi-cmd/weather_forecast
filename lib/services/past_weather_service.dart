@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class WeatherService {
-  final String apiKey = '8e6765f879b04f48b69f37ea80bf2bdf'; // Replace with your Weatherbit API key
+  final String apiKey = '07648ec0bf034aac9dc5e486e901eac9'; // Replace with your Weatherbit API key
   final String baseUrl = 'https://api.weatherbit.io/v2.0/history/daily';
 
   Future<Map<String, dynamic>> getPastWeatherData(String city, String date) async {
